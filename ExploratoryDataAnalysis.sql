@@ -60,11 +60,32 @@ From SQL_Data_Exploration..CovidDeaths
 where continent is not null
 order by 1, 2
 
--- Total Population vs Vaccinations
+-- Total Population vs Vaccinations using CTE
+With PopVsVac (Continent, Location, Data, Population, New_Vaccinations, RollingVaccinations)
+as
+(
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location 
+	Order by dea.location, dea.date) as RollingVaccinations
+--, (RollingVaccinations/population)*100 as PopulationPercentageVaccinated
 From SQL_Data_Exploration..CovidDeaths dea
 Join SQL_Data_Exploration..CovidVaccinations vac
 	On dea.location = vac.location
 	and dea.date = vac.date
 where dea.continent is not null
+)
+Select *, (RollingVaccinations/Population)*100 as PecentagePopulationVaccinated
+From PopVsVac
 order by 2, 3
+
+-- Creating View to store data for visualizations
+Create view PercentPopulationVaccinated as 
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as int)) OVER (Partition by dea.location 
+	Order by dea.location, dea.date) as RollingVaccinations
+--, (RollingVaccinations/population)*100 as PopulationPercentageVaccinated
+From SQL_Data_Exploration..CovidDeaths dea
+Join SQL_Data_Exploration..CovidVaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+where dea.continent is not null
