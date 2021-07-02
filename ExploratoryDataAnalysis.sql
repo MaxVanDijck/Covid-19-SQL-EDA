@@ -50,9 +50,9 @@ order by TotalDeathCount desc
 -- Population Deathrate per continent
 Select Location, MAX(cast(total_deaths as int)) as HighestDeathCount, Max((total_deaths/population)*100) as PercentPopulationDeaths
 From SQL_Data_Exploration..CovidDeaths
-Where continent is null
+Where continent is null and location not in ('World', 'European Union', 'International')
 Group by Location
-order by PercentPopulationDeaths desc
+order by HighestDeathCount desc
 
 -- Global numbers
 Select SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(new_cases)*100 as DeathPercentage
