@@ -43,7 +43,7 @@ order by PercentPopulationDeaths desc
 -- Deaths per continent
 Select Location, Max(cast(Total_deaths as int)) as TotalDeathCount
 From SQL_Data_Exploration..CovidDeaths
-Where continent is null
+Where continent is null and location not in ('World', 'European Union', 'International')
 Group by Location
 order by TotalDeathCount desc
 
